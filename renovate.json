@@ -1,0 +1,19 @@
+{
+  "extends": [
+    "config:base"
+  ],
+  "packageRules": [
+    {
+      "matchPackagePatterns": [
+        "org.springframework.boot"
+      ],
+      "groupName": "Spring Boot"
+    },
+    {
+      "matchPackagePatterns": [
+        "org.apache.maven.plugins"
+      ],
+      "groupName": "Maven Plugins"
+    }
+  ]
+}

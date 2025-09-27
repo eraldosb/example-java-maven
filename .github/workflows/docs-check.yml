@@ -1,0 +1,119 @@
+name: Documentation Check
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'src/**'
+      - 'frontend/src/**'
+      - 'pom.xml'
+      - 'frontend/package.json'
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'src/**'
+      - 'frontend/src/**'
+      - 'pom.xml'
+      - 'frontend/package.json'
+
+jobs:
+  check-documentation:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+    
+    - name: Install frontend dependencies
+      run: |
+        cd frontend
+        npm ci
+    
+    - name: Check if documentation needs update
+      id: doc-check
+      run: |
+        echo "Checking for code changes that require documentation updates..."
+        
+        # Check for new endpoints in controllers
+        if git diff --name-only HEAD~1 HEAD | grep -E "src/main/java.*Controller\.java$"; then
+          echo "API changes detected - API_DOCUMENTATION.md may need updates"
+          echo "api_changed=true" >> $GITHUB_OUTPUT
+        else
+          echo "api_changed=false" >> $GITHUB_OUTPUT
+        fi
+        
+        # Check for new components in frontend
+        if git diff --name-only HEAD~1 HEAD | grep -E "frontend/src/components/.*\.tsx?$"; then
+          echo "Frontend component changes detected - FRONTEND_DOCUMENTATION.md may need updates"
+          echo "frontend_changed=true" >> $GITHUB_OUTPUT
+        else
+          echo "frontend_changed=false" >> $GITHUB_OUTPUT
+        fi
+        
+        # Check for architecture changes
+        if git diff --name-only HEAD~1 HEAD | grep -E "(pom\.xml|package\.json|Dockerfile|docker-compose\.yml)$"; then
+          echo "Architecture changes detected - ARCHITECTURE.md and DEPLOYMENT.md may need updates"
+          echo "architecture_changed=true" >> $GITHUB_OUTPUT
+        else
+          echo "architecture_changed=false" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Comment on PR if documentation needs update
+      if: github.event_name == 'pull_request' && (steps.doc-check.outputs.api_changed == 'true' || steps.doc-check.outputs.frontend_changed == 'true' || steps.doc-check.outputs.architecture_changed == 'true')
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const changes = [];
+          if ('${{ steps.doc-check.outputs.api_changed }}' === 'true') {
+            changes.push('📚 **API_DOCUMENTATION.md** - Novos endpoints ou mudanças na API');
+          }
+          if ('${{ steps.doc-check.outputs.frontend_changed }}' === 'true') {
+            changes.push('🎨 **FRONTEND_DOCUMENTATION.md** - Novos componentes ou mudanças no frontend');
+          }
+          if ('${{ steps.doc-check.outputs.architecture_changed }}' === 'true') {
+            changes.push('🏗️ **ARCHITECTURE.md** e **DEPLOYMENT.md** - Mudanças na arquitetura ou deployment');
+          }
+          
+          const comment = `## 📝 Documentação Precisa ser Atualizada
+          
+          Detectamos mudanças no código que podem requerer atualizações na documentação:
+          
+          ${changes.map(change => `- ${change}`).join('\n')}
+          
+          ### ✅ Checklist de Documentação:
+          - [ ] Revisar e atualizar documentação relevante
+          - [ ] Verificar se exemplos de código estão atualizados
+          - [ ] Confirmar que diagramas refletem a arquitetura atual
+          - [ ] Testar exemplos de API/documentação
+          
+          ### 📖 Guias de Referência:
+          - [DEVELOPMENT_STANDARDS.md](./DEVELOPMENT_STANDARDS.md) - Padrões de documentação
+          - [GIT_WORKFLOW.md](./GIT_WORKFLOW.md) - Processo de desenvolvimento
+          
+          **Por favor, atualize a documentação antes de fazer merge!** 🚀`;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+    
+    - name: Fail if documentation is outdated
+      if: steps.doc-check.outputs.api_changed == 'true' || steps.doc-check.outputs.frontend_changed == 'true' || steps.doc-check.outputs.architecture_changed == 'true'
+      run: |
+        echo "❌ Documentação precisa ser atualizada antes do merge!"
+        echo "Por favor, revise e atualize a documentação relevante."
+        exit 1

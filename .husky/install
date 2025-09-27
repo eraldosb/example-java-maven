@@ -1,0 +1,27 @@
+#!/usr/bin/env sh
+echo "🔧 Installing Husky git hooks..."
+
+# Make sure we're in a git repository
+if [ ! -d ".git" ]; then
+    echo "❌ Not a git repository. Please run 'git init' first."
+    exit 1
+fi
+
+# Make sure husky is installed
+if ! command -v husky &> /dev/null; then
+    echo "❌ Husky is not installed. Please run 'npm install --save-dev husky' first."
+    exit 1
+fi
+
+# Install husky
+husky install
+
+echo "✅ Husky git hooks installed successfully!"
+echo ""
+echo "Available hooks:"
+echo "  📝 pre-commit  - Runs before each commit"
+echo "  📝 commit-msg  - Validates commit message format"
+echo "  🚀 pre-push    - Runs before each push"
+echo ""
+echo "To disable a hook, remove the corresponding file from .husky/"
+echo "To modify a hook, edit the corresponding file in .husky/"

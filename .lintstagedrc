@@ -1,0 +1,253 @@
+{
+  "*.{js,ts,jsx,tsx}": [
+    "eslint --fix",
+    "prettier --write"
+  ],
+  "*.{json,md,yml,yaml}": [
+    "prettier --write"
+  ],
+  "*.java": [
+    "echo 'Java files will be checked by Maven Checkstyle'"
+  ],
+  "*.{xml,properties}": [
+    "echo 'XML and Properties files will be checked by Maven'"
+  ],
+  "*.{sh,bat,cmd}": [
+    "echo 'Shell scripts will be checked for syntax'"
+  ],
+  "*.{dockerfile,Dockerfile}": [
+    "echo 'Docker files will be checked for syntax'"
+  ],
+  "*.{yml,yaml}": [
+    "echo 'YAML files will be checked for syntax'"
+  ],
+  "*.{md,mdx}": [
+    "prettier --write",
+    "echo 'Markdown files will be checked for formatting'"
+  ],
+  "*.{css,scss,sass,less}": [
+    "prettier --write"
+  ],
+  "*.{html,htm}": [
+    "prettier --write"
+  ],
+  "*.{sql}": [
+    "echo 'SQL files will be checked for syntax'"
+  ],
+  "*.{py}": [
+    "echo 'Python files will be checked for syntax'"
+  ],
+  "*.{rb}": [
+    "echo 'Ruby files will be checked for syntax'"
+  ],
+  "*.{php}": [
+    "echo 'PHP files will be checked for syntax'"
+  ],
+  "*.{go}": [
+    "echo 'Go files will be checked for syntax'"
+  ],
+  "*.{rs}": [
+    "echo 'Rust files will be checked for syntax'"
+  ],
+  "*.{cpp,c,cc,cxx,h,hpp}": [
+    "echo 'C/C++ files will be checked for syntax'"
+  ],
+  "*.{cs}": [
+    "echo 'C# files will be checked for syntax'"
+  ],
+  "*.{swift}": [
+    "echo 'Swift files will be checked for syntax'"
+  ],
+  "*.{kt}": [
+    "echo 'Kotlin files will be checked for syntax'"
+  ],
+  "*.{scala}": [
+    "echo 'Scala files will be checked for syntax'"
+  ],
+  "*.{clj,cljs,cljc,edn}": [
+    "echo 'Clojure files will be checked for syntax'"
+  ],
+  "*.{hs,lhs}": [
+    "echo 'Haskell files will be checked for syntax'"
+  ],
+  "*.{ml,mli}": [
+    "echo 'OCaml files will be checked for syntax'"
+  ],
+  "*.{fs,fsi,fsx}": [
+    "echo 'F# files will be checked for syntax'"
+  ],
+  "*.{erl,hrl}": [
+    "echo 'Erlang files will be checked for syntax'"
+  ],
+  "*.{ex,exs}": [
+    "echo 'Elixir files will be checked for syntax'"
+  ],
+  "*.{jl}": [
+    "echo 'Julia files will be checked for syntax'"
+  ],
+  "*.{r}": [
+    "echo 'R files will be checked for syntax'"
+  ],
+  "*.{m,mm}": [
+    "echo 'Objective-C files will be checked for syntax'"
+  ],
+  "*.{pl,pm}": [
+    "echo 'Perl files will be checked for syntax'"
+  ],
+  "*.{lua}": [
+    "echo 'Lua files will be checked for syntax'"
+  ],
+  "*.{vim}": [
+    "echo 'Vim files will be checked for syntax'"
+  ],
+  "*.{emacs,el}": [
+    "echo 'Emacs files will be checked for syntax'"
+  ],
+  "*.{tex}": [
+    "echo 'LaTeX files will be checked for syntax'"
+  ],
+  "*.{rst}": [
+    "echo 'reStructuredText files will be checked for syntax'"
+  ],
+  "*.{adoc,asciidoc}": [
+    "echo 'AsciiDoc files will be checked for syntax'"
+  ],
+  "*.{org}": [
+    "echo 'Org mode files will be checked for syntax'"
+  ],
+  "*.{wiki}": [
+    "echo 'Wiki files will be checked for syntax'"
+  ],
+  "*.{txt}": [
+    "echo 'Text files will be checked for formatting'"
+  ],
+  "*.{log}": [
+    "echo 'Log files will be checked for formatting'"
+  ],
+  "*.{ini,cfg,conf}": [
+    "echo 'Configuration files will be checked for syntax'"
+  ],
+  "*.{toml}": [
+    "echo 'TOML files will be checked for syntax'"
+  ],
+  "*.{env}": [
+    "echo 'Environment files will be checked for syntax'"
+  ],
+  "*.{gitignore,gitattributes}": [
+    "echo 'Git files will be checked for syntax'"
+  ],
+  "*.{dockerignore}": [
+    "echo 'Docker ignore files will be checked for syntax'"
+  ],
+  "*.{editorconfig}": [
+    "echo 'EditorConfig files will be checked for syntax'"
+  ],
+  "*.{eslintrc,eslintignore}": [
+    "echo 'ESLint files will be checked for syntax'"
+  ],
+  "*.{prettierrc,prettierignore}": [
+    "echo 'Prettier files will be checked for syntax'"
+  ],
+  "*.{huskyrc}": [
+    "echo 'Husky files will be checked for syntax'"
+  ],
+  "*.{lintstagedrc}": [
+    "echo 'Lint-staged files will be checked for syntax'"
+  ],
+  "*.{commitlintrc}": [
+    "echo 'Commitlint files will be checked for syntax'"
+  ],
+  "*.{renovaterc}": [
+    "echo 'Renovate files will be checked for syntax'"
+  ],
+  "*.{semantic-release}": [
+    "echo 'Semantic Release files will be checked for syntax'"
+  ],
+  "*.{dependabot}": [
+    "echo 'Dependabot files will be checked for syntax'"
+  ],
+  "*.{github}": [
+    "echo 'GitHub files will be checked for syntax'"
+  ],
+  "*.{gitlab}": [
+    "echo 'GitLab files will be checked for syntax'"
+  ],
+  "*.{bitbucket}": [
+    "echo 'Bitbucket files will be checked for syntax'"
+  ],
+  "*.{azure}": [
+    "echo 'Azure files will be checked for syntax'"
+  ],
+  "*.{jenkins}": [
+    "echo 'Jenkins files will be checked for syntax'"
+  ],
+  "*.{travis}": [
+    "echo 'Travis files will be checked for syntax'"
+  ],
+  "*.{circle}": [
+    "echo 'CircleCI files will be checked for syntax'"
+  ],
+  "*.{appveyor}": [
+    "echo 'AppVeyor files will be checked for syntax'"
+  ],
+  "*.{bamboo}": [
+    "echo 'Bamboo files will be checked for syntax'"
+  ],
+  "*.{teamcity}": [
+    "echo 'TeamCity files will be checked for syntax'"
+  ],
+  "*.{buildkite}": [
+    "echo 'Buildkite files will be checked for syntax'"
+  ],
+  "*.{drone}": [
+    "echo 'Drone files will be checked for syntax'"
+  ],
+  "*.{wercker}": [
+    "echo 'Wercker files will be checked for syntax'"
+  ],
+  "*.{codeship}": [
+    "echo 'Codeship files will be checked for syntax'"
+  ],
+  "*.{semaphore}": [
+    "echo 'Semaphore files will be checked for syntax'"
+  ],
+  "*.{shippable}": [
+    "echo 'Shippable files will be checked for syntax'"
+  ],
+  "*.{solano}": [
+    "echo 'Solano files will be checked for syntax'"
+  ],
+  "*.{magnum}": [
+    "echo 'Magnum files will be checked for syntax'"
+  ],
+  "*.{snap}": [
+    "echo 'Snap files will be checked for syntax'"
+  ],
+  "*.{strider}": [
+    "echo 'Strider files will be checked for syntax'"
+  ],
+  "*.{wercker}": [
+    "echo 'Wercker files will be checked for syntax'"
+  ],
+  "*.{codeship}": [
+    "echo 'Codeship files will be checked for syntax'"
+  ],
+  "*.{semaphore}": [
+    "echo 'Semaphore files will be checked for syntax'"
+  ],
+  "*.{shippable}": [
+    "echo 'Shippable files will be checked for syntax'"
+  ],
+  "*.{solano}": [
+    "echo 'Solano files will be checked for syntax'"
+  ],
+  "*.{magnum}": [
+    "echo 'Magnum files will be checked for syntax'"
+  ],
+  "*.{snap}": [
+    "echo 'Snap files will be checked for syntax'"
+  ],
+  "*.{strider}": [
+    "echo 'Strider files will be checked for syntax'"
+  ]
+}

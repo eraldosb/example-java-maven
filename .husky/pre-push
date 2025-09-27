@@ -1,0 +1,49 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🚀 Running pre-push checks..."
+
+# Check if we're in a Java project
+if [ -f "pom.xml" ]; then
+    echo "☕ Java project detected, running comprehensive checks..."
+    
+    # Run full test suite
+    echo "🧪 Running full test suite..."
+    mvn clean test
+    
+    if [ $? -ne 0 ]; then
+        echo "❌ Tests failed. Push cancelled."
+        exit 1
+    fi
+    
+    # Run quality checks
+    echo "🔍 Running quality checks..."
+    mvn checkstyle:check spotbugs:check pmd:check
+    
+    if [ $? -ne 0 ]; then
+        echo "❌ Quality checks failed. Push cancelled."
+        exit 1
+    fi
+    
+    # Check coverage
+    echo "📊 Checking test coverage..."
+    mvn jacoco:check
+    
+    if [ $? -ne 0 ]; then
+        echo "❌ Coverage threshold not met. Push cancelled."
+        exit 1
+    fi
+    
+    echo "✅ All pre-push checks passed!"
+else
+    echo "📝 Non-Java project, running basic checks..."
+    
+    # Check for sensitive information
+    if grep -r "password\|secret\|key\|token" --include="*.java" --include="*.js" --include="*.ts" --include="*.properties" --include="*.yml" --include="*.yaml" .; then
+        echo "⚠️  Potential sensitive information found. Please review."
+    fi
+    
+    echo "✅ Basic pre-push checks passed!"
+fi
+
+echo "🎉 All pre-push checks passed! Proceeding with push..."

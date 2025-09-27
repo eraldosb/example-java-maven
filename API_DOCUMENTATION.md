@@ -4,6 +4,21 @@
 **Data:** 2024-01-15  
 **Versão:** 1.0.0  
 
+## Sumário
+
+- [Resumo Executivo](#resumo-executivo)
+- [Contexto](#contexto)
+- [Estrutura da API](#estrutura-da-api)
+- [Endpoints da API](#endpoints-da-api)
+- [Modelo de Dados](#modelo-de-dados)
+- [Validações e Regras de Negócio](#validações-e-regras-de-negócio)
+- [Tratamento de Erros](#tratamento-de-erros)
+- [Exemplos de Integração](#exemplos-de-integração)
+- [Rate Limiting e Performance](#rate-limiting-e-performance)
+- [Segurança](#segurança)
+- [Monitoramento e Logs](#monitoramento-e-logs)
+- [Referências](#referências)
+
 ## Resumo Executivo
 
 A API REST da User Management Application fornece endpoints completos para gerenciamento de usuários, implementando operações CRUD, busca avançada, filtros e estatísticas. A API segue os princípios RESTful e utiliza Spring Boot com validação robusta de dados.

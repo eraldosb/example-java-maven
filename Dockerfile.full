@@ -1,0 +1,52 @@
+# Multi-stage build para incluir frontend e backend
+FROM node:18-alpine AS frontend-builder
+
+# Configurar diretório de trabalho para o frontend
+WORKDIR /app/frontend
+
+# Copiar package.json e package-lock.json
+COPY frontend/package*.json ./
+
+# Instalar dependências
+RUN npm ci --only=production
+
+# Copiar código fonte do frontend
+COPY frontend/ ./
+
+# Build do frontend
+RUN npm run build
+
+# Stage para o backend
+FROM openjdk:11-jre-slim
+
+# Instalar nginx para servir o frontend
+RUN apt-get update && \
+    apt-get install -y nginx && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Configurar nginx
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Copiar build do frontend
+COPY --from=frontend-builder /app/frontend/build /usr/share/nginx/html
+
+# Configurar diretório de trabalho
+WORKDIR /app
+
+# Copiar JAR do backend
+COPY target/user-management-app-1.0.0.jar app.jar
+
+# Expor portas
+EXPOSE 8080 80
+
+# Script de inicialização
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:8080/api/health/simple || exit 1
+
+# Comando de inicialização
+ENTRYPOINT ["/docker-entrypoint.sh"]

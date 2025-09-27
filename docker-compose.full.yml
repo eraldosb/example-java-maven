@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  user-management-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.full
+    container_name: user-management-full-app
+    ports:
+      - "80:80"      # Frontend (nginx)
+      - "8080:8080"  # Backend (Spring Boot)
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:h2:mem:testdb
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.h2.Driver
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=
+      - SPRING_H2_CONSOLE_ENABLED=true
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop
+      - SPRING_JPA_SHOW_SQL=false
+      - LOGGING_LEVEL_COM_EXAMPLE=INFO
+    volumes:
+      - ./logs:/app/logs
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health/simple"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - user-management-network
+
+networks:
+  user-management-network:
+    driver: bridge
+
+volumes:
+  logs:
+    driver: local

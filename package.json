@@ -1,0 +1,127 @@
+{
+  "name": "user-management-app",
+  "version": "1.0.0",
+  "description": "Uma aplicação Java moderna para gerenciamento de usuários construída com Spring Boot",
+  "main": "index.js",
+  "scripts": {
+    "prepare": "husky install",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "echo \"Tests are run with Maven: mvn test\"",
+    "build": "echo \"Build is done with Maven: mvn clean package\"",
+    "start": "echo \"Start with Maven: mvn spring-boot:run\"",
+    "docker:build": "docker build -t user-management-app .",
+    "docker:run": "docker run -p 8080:8080 user-management-app",
+    "docker:compose": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "quality:check": "mvn checkstyle:check spotbugs:check pmd:check",
+    "quality:report": "mvn jacoco:report",
+    "coverage:check": "mvn jacoco:check",
+    "clean": "mvn clean",
+    "compile": "mvn compile",
+    "package": "mvn package",
+    "install": "mvn install",
+    "validate": "mvn validate",
+    "verify": "mvn verify",
+    "site": "mvn site",
+    "dependency:tree": "mvn dependency:tree",
+    "dependency:analyze": "mvn dependency:analyze",
+    "versions:display-dependency-updates": "mvn versions:display-dependency-updates",
+    "versions:display-plugin-updates": "mvn versions:display-plugin-updates",
+    "help": "mvn help:describe -Dplugin=help -Ddetail=true"
+  },
+  "keywords": [
+    "java",
+    "spring-boot",
+    "maven",
+    "user-management",
+    "rest-api",
+    "h2-database",
+    "junit",
+    "jacoco",
+    "docker",
+    "microservices"
+  ],
+  "author": "User Management Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/user-management-app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/user-management-app/issues"
+  },
+  "homepage": "https://github.com/your-username/user-management-app#readme",
+  "devDependencies": {
+    "husky": "^8.0.3",
+    "lint-staged": "^13.1.0",
+    "prettier": "^2.8.4",
+    "eslint": "^8.35.0",
+    "@typescript-eslint/eslint-plugin": "^5.54.0",
+    "@typescript-eslint/parser": "^5.54.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "commitizen": "^4.3.0",
+    "cz-conventional-changelog": "^3.3.0",
+    "conventional-changelog-cli": "^2.2.2",
+    "semantic-release": "^20.1.0",
+    "@semantic-release/changelog": "^6.0.1",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^8.0.7",
+    "renovate": "^34.0.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "lint-staged": {
+    "*.{js,ts,jsx,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ],
+    "*.java": [
+      "echo 'Java files will be checked by Maven Checkstyle'"
+    ]
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+      "pre-push": "npm run quality:check"
+    }
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "renovate": {
+    "extends": [
+      "config:base"
+    ],
+    "packageRules": [
+      {
+        "matchPackagePatterns": [
+          "org.springframework.boot"
+        ],
+        "groupName": "Spring Boot"
+      },
+      {
+        "matchPackagePatterns": [
+          "org.apache.maven.plugins"
+        ],
+        "groupName": "Maven Plugins"
+      }
+    ]
+  }
+}

@@ -1,0 +1,25 @@
+#!/usr/bin/env sh
+echo "🗑️  Uninstalling Husky git hooks..."
+
+# Make sure we're in a git repository
+if [ ! -d ".git" ]; then
+    echo "❌ Not a git repository."
+    exit 1
+fi
+
+# Remove husky hooks
+if [ -d ".husky" ]; then
+    rm -rf .husky
+    echo "✅ Husky hooks removed successfully!"
+else
+    echo "⚠️  No Husky hooks found to remove."
+fi
+
+# Remove husky from package.json if it exists
+if [ -f "package.json" ]; then
+    if grep -q "husky" package.json; then
+        echo "⚠️  Husky is still listed in package.json. You may want to remove it manually."
+    fi
+fi
+
+echo "🎉 Husky uninstallation complete!"

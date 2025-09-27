@@ -4,6 +4,18 @@
 **Data:** 2024-01-15  
 **Versão:** 1.0.0  
 
+## Sumário
+
+- [Resumo Executivo](#resumo-executivo)
+- [Contexto](#contexto)
+- [Arquitetura](#arquitetura)
+- [Fluxo de Dados / Sequência](#fluxo-de-dados--sequência)
+- [Boas Práticas e Padrões Adotados](#boas-práticas-e-padrões-adotados)
+- [Exemplos de Uso](#exemplos-de-uso)
+- [Riscos e Considerações](#riscos-e-considerações)
+- [Decisões Arquiteturais (ADR)](#decisões-arquiteturais-adr)
+- [Referências](#referências)
+
 ## Resumo Executivo
 
 A User Management Application é uma aplicação full-stack moderna construída com Spring Boot (backend) e React (frontend), implementando uma arquitetura em camadas com separação clara de responsabilidades. A aplicação oferece funcionalidades completas de CRUD para gerenciamento de usuários, com interface web responsiva e API REST robusta.

@@ -1,0 +1,83 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Running pre-commit checks..."
+
+# Check if we're in a Java project
+if [ -f "pom.xml" ]; then
+    echo "☕ Java project detected, running Maven checks..."
+    
+    # Run Maven validate
+    echo "📋 Validating Maven configuration..."
+    mvn validate
+    
+    if [ $? -ne 0 ]; then
+        echo "❌ Maven validation failed. Commit cancelled."
+        exit 1
+    fi
+    
+    # Run Checkstyle
+    echo "🔍 Running Checkstyle..."
+    mvn checkstyle:check
+    
+    if [ $? -ne 0 ]; then
+        echo "❌ Checkstyle failed. Commit cancelled."
+        exit 1
+    fi
+    
+    # Run tests
+    echo "🧪 Running tests..."
+    mvn test
+    
+    if [ $? -ne 0 ]; then
+        echo "❌ Tests failed. Commit cancelled."
+        exit 1
+    fi
+    
+    echo "✅ All pre-commit checks passed!"
+else
+    echo "📝 Non-Java project, running basic checks..."
+    
+    # Check for TODO/FIXME comments
+    if grep -r "TODO\|FIXME\|XXX" --include="*.java" --include="*.js" --include="*.ts" --include="*.jsx" --include="*.tsx" .; then
+        echo "⚠️  TODO/FIXME/XXX comments found. Consider addressing them."
+    fi
+    
+    # Check for console.log statements
+    if grep -r "console\.log" --include="*.js" --include="*.ts" --include="*.jsx" --include="*.tsx" .; then
+        echo "⚠️  console.log statements found. Consider using a logger instead."
+    fi
+    
+    # Check for debugger statements
+    if grep -r "debugger" --include="*.js" --include="*.ts" --include="*.jsx" --include="*.tsx" .; then
+        echo "❌ debugger statements found. Commit cancelled."
+        exit 1
+    fi
+    
+    echo "✅ Basic pre-commit checks passed!"
+fi
+
+# Run Prettier if available
+if command -v prettier &> /dev/null; then
+    echo "🎨 Running Prettier..."
+    prettier --check .
+    
+    if [ $? -ne 0 ]; then
+        echo "❌ Prettier formatting failed. Commit cancelled."
+        exit 1
+    fi
+fi
+
+# Run ESLint if available
+if command -v eslint &> /dev/null; then
+    echo "🔍 Running ESLint..."
+    eslint .
+    
+    if [ $? -ne 0 ]; then
+        echo "❌ ESLint failed. Commit cancelled."
+        exit 1
+    fi
+fi
+
+echo "🎉 All pre-commit checks passed! Proceeding with commit..."
+
