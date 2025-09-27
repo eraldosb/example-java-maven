@@ -11,7 +11,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy the JAR file
-COPY target/user-management-app-v2-2.0.0.jar app.jar
+COPY target/user-management-app-v2-2.1.0.jar app.jar
 
 # Expose port
 EXPOSE 8080

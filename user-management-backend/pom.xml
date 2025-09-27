@@ -17,11 +17,11 @@
 
 	<groupId>com.example</groupId>
 	<artifactId>user-management-app-v2</artifactId>
-	<version>2.0.0</version>
+	<version>2.1.0</version>
 	<packaging>jar</packaging>
 
-	<name>User Management Application v2</name>
-	<description>Uma aplicação Java moderna para gerenciamento de usuários - Versão 2.0</description>
+	<name>User Management Application v2.1</name>
+	<description>Uma aplicação Java moderna para gerenciamento de usuários com autenticação JWT - Versão 2.1</description>
 
 	<properties>
 		<maven.compiler.source>11</maven.compiler.source>

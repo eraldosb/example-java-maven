@@ -4,7 +4,7 @@
 
 set -e
 
-echo "🚀 Iniciando aplicação User Management v2 (Frontend + Backend separados)"
+echo "🚀 Iniciando aplicação User Management v2.1 (Frontend + Backend separados com JWT)"
 echo "================================================================"
 
 # Função para limpar containers anteriores
