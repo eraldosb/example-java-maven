@@ -43,7 +43,7 @@ public class UserManagementApplicationTest {
     @Test
     public void testCreateAndRetrieveUser() throws Exception {
         // Arrange
-        User user = new User("Maria Silva", "maria@email.com");
+        User user = new User("Maria Silva", "maria@email.com", "password123");
         user.setPhone("11988888888");
         user.setAge(25);
 
@@ -68,7 +68,7 @@ public class UserManagementApplicationTest {
     @Test
     public void testUserWorkflow() throws Exception {
         // Arrange
-        User user = new User("Pedro Santos", "pedro@email.com");
+        User user = new User("Pedro Santos", "pedro@email.com", "password123");
         user.setAge(30);
 
         // Act & Assert - 1. Criar usuário
@@ -128,7 +128,7 @@ public class UserManagementApplicationTest {
     @Test
     public void testValidationErrors() throws Exception {
         // Teste com dados inválidos
-        User invalidUser = new User("", ""); // Nome e email vazios
+        User invalidUser = new User("", "", ""); // Nome, email e senha vazios
 
         mockMvc.perform(post("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -139,14 +139,14 @@ public class UserManagementApplicationTest {
     @Test
     public void testDuplicateEmail() throws Exception {
         // Arrange - Criar primeiro usuário
-        User user1 = new User("João Silva", "joao@email.com");
+        User user1 = new User("João Silva", "joao@email.com", "password123");
         mockMvc.perform(post("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(user1)))
                 .andExpect(status().isCreated());
 
         // Act & Assert - Tentar criar segundo usuário com mesmo email
-        User user2 = new User("João Santos", "joao@email.com");
+        User user2 = new User("João Santos", "joao@email.com", "password123");
         mockMvc.perform(post("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(user2)))

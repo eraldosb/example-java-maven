@@ -5,6 +5,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 /**
  * Entidade User que representa um usuário no sistema
@@ -27,12 +28,23 @@ public class User {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
     
+    @NotBlank(message = "Senha é obrigatória")
+    @Size(min = 6, message = "Senha deve ter pelo menos 6 caracteres")
+    @Column(name = "password", nullable = false)
+    private String password;
+    
     @Size(min = 6, max = 20, message = "Telefone deve ter entre 6 e 20 caracteres")
     @Column(name = "phone")
     private String phone;
     
     @Column(name = "age")
     private Integer age;
+    
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role")
+    private Set<Role> roles;
     
     @Column(name = "active", nullable = false)
     private Boolean active = true;
@@ -46,12 +58,14 @@ public class User {
     // Construtores
     public User() {
         this.createdAt = LocalDateTime.now();
+        this.roles = Set.of(Role.USER);
     }
     
-    public User(String name, String email) {
+    public User(String name, String email, String password) {
         this();
         this.name = name;
         this.email = email;
+        this.password = password;
     }
     
     // Getters e Setters
@@ -79,6 +93,14 @@ public class User {
         this.email = email;
     }
     
+    public String getPassword() {
+        return password;
+    }
+    
+    public void setPassword(String password) {
+        this.password = password;
+    }
+    
     public String getPhone() {
         return phone;
     }
@@ -93,6 +115,14 @@ public class User {
     
     public void setAge(Integer age) {
         this.age = age;
+    }
+    
+    public Set<Role> getRoles() {
+        return roles;
+    }
+    
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
     
     public Boolean getActive() {
@@ -125,6 +155,11 @@ public class User {
         this.updatedAt = LocalDateTime.now();
     }
     
+    // Enum para roles
+    public enum Role {
+        USER, ADMIN
+    }
+    
     @Override
     public String toString() {
         return "User{" +
@@ -133,6 +168,7 @@ public class User {
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
                 ", age=" + age +
+                ", roles=" + roles +
                 ", active=" + active +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +

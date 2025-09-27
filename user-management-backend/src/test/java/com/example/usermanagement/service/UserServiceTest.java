@@ -34,7 +34,7 @@ public class UserServiceTest {
 
     @Before
     public void setUp() {
-        testUser = new User("João Silva", "joao@email.com");
+        testUser = new User("João Silva", "joao@email.com", "password123");
         testUser.setId(1L);
         testUser.setPhone("11999999999");
         testUser.setAge(30);
@@ -128,7 +128,7 @@ public class UserServiceTest {
     @Test
     public void testUpdateUser_Success() {
         // Arrange
-        User updatedUser = new User("João Santos", "joao@email.com");
+        User updatedUser = new User("João Santos", "joao@email.com", "password123");
         updatedUser.setPhone("11888888888");
         updatedUser.setAge(31);
 
