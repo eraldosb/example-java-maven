@@ -11,15 +11,23 @@ import {
   useColorModeValue,
   Spacer,
   Badge,
+  Button,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Avatar,
 } from '@chakra-ui/react'
 import {
   HamburgerIcon,
   CloseIcon,
   SettingsIcon,
   InfoIcon,
+  ChevronDownIcon,
 } from '@chakra-ui/icons'
 import { Link as RouterLink, useLocation } from 'react-router-dom'
 import { Link } from '@chakra-ui/react'
+import { useAuth } from '../contexts/AuthContext'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -102,6 +110,8 @@ const SidebarContent = ({ onClose }: { onClose: () => void }) => {
 }
 
 const MobileNav = ({ onOpen }: { onOpen: () => void }) => {
+  const { user, logout } = useAuth()
+
   return (
     <Flex
       ml={{ base: 0, md: 60 }}
@@ -124,9 +134,30 @@ const MobileNav = ({ onOpen }: { onOpen: () => void }) => {
       <HStack spacing={{ base: '0', md: '6' }}>
         <Flex alignItems={'center'}>
           <Text fontSize="lg" fontWeight="bold" color="brand.500">
-            User Management
+            User Management v2.1
           </Text>
         </Flex>
+        
+        <Spacer />
+        
+        <Menu>
+          <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="ghost">
+            <HStack>
+              <Avatar size="sm" name={user?.name} />
+              <VStack spacing={0} align="start" display={{ base: 'none', md: 'flex' }}>
+                <Text fontSize="sm" fontWeight="bold">{user?.name}</Text>
+                <Text fontSize="xs" color="gray.500">
+                  {user?.roles.includes('ADMIN') ? 'Administrador' : 'Usuário'}
+                </Text>
+              </VStack>
+            </HStack>
+          </MenuButton>
+          <MenuList>
+            <MenuItem onClick={logout}>
+              Sair
+            </MenuItem>
+          </MenuList>
+        </Menu>
       </HStack>
     </Flex>
   )
