@@ -2,10 +2,13 @@ import React from 'react'
 import { ChakraProvider } from '@chakra-ui/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { AuthProvider } from './contexts/AuthContext'
 import { Layout } from './components/Layout'
 import { DashboardPage } from './pages/DashboardPage'
 import { UsersPage } from './pages/UsersPage'
 import { StatusPage } from './pages/StatusPage'
+import LoginPage from './pages/LoginPage'
+import ProtectedRoute from './components/ProtectedRoute'
 import theme from './theme'
 
 // Create a client
@@ -23,16 +26,35 @@ function App() {
   return (
     <ChakraProvider theme={theme}>
       <QueryClientProvider client={queryClient}>
-        <Router>
-          <Layout>
+        <AuthProvider>
+          <Router>
             <Routes>
-              <Route path="/" element={<DashboardPage />} />
-              <Route path="/users" element={<UsersPage />} />
-              <Route path="/status" element={<StatusPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/" element={
+                <ProtectedRoute>
+                  <Layout>
+                    <DashboardPage />
+                  </Layout>
+                </ProtectedRoute>
+              } />
+              <Route path="/users" element={
+                <ProtectedRoute>
+                  <Layout>
+                    <UsersPage />
+                  </Layout>
+                </ProtectedRoute>
+              } />
+              <Route path="/status" element={
+                <ProtectedRoute>
+                  <Layout>
+                    <StatusPage />
+                  </Layout>
+                </ProtectedRoute>
+              } />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
-          </Layout>
-        </Router>
+          </Router>
+        </AuthProvider>
       </QueryClientProvider>
     </ChakraProvider>
   )

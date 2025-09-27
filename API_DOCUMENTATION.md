@@ -26,7 +26,7 @@ A API REST da User Management Application fornece endpoints completos para geren
 ### Características Principais:
 - **Base URL**: `http://localhost:8080/api`
 - **Formato**: JSON
-- **Autenticação**: Não implementada (desenvolvimento)
+- **Autenticação**: JWT (JSON Web Token)
 - **Validação**: Bean Validation (JSR-303)
 - **CORS**: Habilitado para todas as origens
 
@@ -88,9 +88,141 @@ Versionamento: Não implementado (v1 implícita)
 }
 ```
 
+## Autenticação
+
+### Sistema JWT
+A API utiliza JWT (JSON Web Token) para autenticação. Todos os endpoints protegidos requerem um token válido no header `Authorization`.
+
+#### Como obter um token:
+1. **Registrar novo usuário** via `POST /api/auth/register`
+2. **Fazer login** via `POST /api/auth/login`
+
+#### Como usar o token:
+```bash
+# Incluir o token no header Authorization
+curl -H "Authorization: Bearer SEU_TOKEN_AQUI" http://localhost:8080/api/users
+```
+
+#### Usuários padrão criados automaticamente:
+- **Admin**: `admin@example.com` / `admin123`
+- **User**: `user@example.com` / `user123`
+
+### Endpoints de Autenticação
+
+#### 1.1 Login
+**POST** `/api/auth/login`
+
+Autentica um usuário e retorna um token JWT.
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "user123"
+}
+```
+
+**Respostas:**
+- `200 OK`: Login bem-sucedido
+- `400 Bad Request`: Credenciais inválidas
+
+**Exemplo de Uso:**
+```bash
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "password": "user123"
+  }'
+```
+
+**Resposta de Sucesso:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": 1,
+    "name": "Usuário Padrão",
+    "email": "user@example.com",
+    "roles": ["USER"]
+  }
+}
+```
+
+#### 1.2 Registro
+**POST** `/api/auth/register`
+
+Registra um novo usuário no sistema.
+
+**Request Body:**
+```json
+{
+  "name": "João Silva",
+  "email": "joao@email.com",
+  "password": "senha123",
+  "phone": "11999999999",
+  "age": 30
+}
+```
+
+**Validações:**
+- `name`: Obrigatório, 2-100 caracteres
+- `email`: Obrigatório, formato válido, único
+- `password`: Obrigatório, mínimo 6 caracteres
+- `phone`: Opcional, 6-20 caracteres
+- `age`: Opcional, número inteiro
+
+**Respostas:**
+- `200 OK`: Usuário registrado com sucesso
+- `400 Bad Request`: Dados inválidos ou email duplicado
+
+**Exemplo de Uso:**
+```bash
+curl -X POST http://localhost:8080/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "João Silva",
+    "email": "joao@email.com",
+    "password": "senha123",
+    "phone": "11999999999",
+    "age": 30
+  }'
+```
+
+#### 1.3 Validação de Token
+**POST** `/api/auth/validate`
+
+Valida se um token JWT é válido.
+
+**Headers:**
+- `Authorization`: Bearer token
+
+**Respostas:**
+- `200 OK`: Token válido
+- `400 Bad Request`: Token inválido ou expirado
+
+**Exemplo de Uso:**
+```bash
+curl -X POST http://localhost:8080/api/auth/validate \
+  -H "Authorization: Bearer SEU_TOKEN_AQUI"
+```
+
+**Resposta de Sucesso:**
+```json
+{
+  "valid": true,
+  "user": {
+    "id": 1,
+    "name": "Usuário Padrão",
+    "email": "user@example.com",
+    "roles": ["USER"]
+  }
+}
+```
+
 ## Endpoints da API
 
-### 1. Usuários
+### 2. Usuários
 
 #### 1.1 Criar Usuário
 **POST** `/api/users`
@@ -724,20 +856,48 @@ get_user_stats
 
 ## Segurança
 
-### Considerações Atuais
-- **Autenticação**: Não implementada
-- **Autorização**: Não implementada
+### Implementações Atuais
+- **Autenticação**: JWT (JSON Web Token)
+- **Autorização**: Baseada em roles (USER, ADMIN)
 - **CORS**: Habilitado para todas as origens
-- **HTTPS**: Não configurado
+- **Validação**: Bean Validation para entrada de dados
+- **Criptografia**: BCrypt para senhas
+
+### Sistema de Autenticação
+
+#### JWT Token
+- **Algoritmo**: HS256
+- **Expiração**: 24 horas (configurável)
+- **Secret**: Configurável via `jwt.secret`
+- **Header**: `Authorization: Bearer <token>`
+
+#### Roles e Permissões
+- **USER**: Acesso aos endpoints `/api/users/**`
+- **ADMIN**: Acesso completo + endpoints `/api/admin/**`
+- **Público**: Endpoints `/api/auth/**` e `/api/health/**`
+
+#### Endpoints Protegidos
+```bash
+# Requer autenticação USER ou ADMIN
+GET /api/users
+POST /api/users
+PUT /api/users/{id}
+DELETE /api/users/{id}
+
+# Requer autenticação ADMIN
+GET /api/admin/users
+POST /api/admin/users
+```
 
 ### Recomendações para Produção
 
-1. **Implementar Autenticação JWT**
-2. **Configurar CORS adequadamente**
-3. **Usar HTTPS**
-4. **Implementar Rate Limiting**
-5. **Validar e sanitizar todas as entradas**
-6. **Implementar logging de auditoria**
+1. **Configurar HTTPS**
+2. **Implementar Rate Limiting**
+3. **Configurar CORS adequadamente**
+4. **Usar secret JWT forte**
+5. **Implementar refresh tokens**
+6. **Logging de auditoria**
+7. **Validação adicional de entrada**
 
 ## Monitoramento e Logs
 

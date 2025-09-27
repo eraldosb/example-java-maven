@@ -5,6 +5,8 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  * Entidade User que representa um usuário no sistema
@@ -42,6 +44,22 @@ public class User {
     
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+    
+    @NotBlank(message = "Senha é obrigatória")
+    @Size(min = 6, message = "Senha deve ter pelo menos 6 caracteres")
+    @Column(name = "password", nullable = false)
+    private String password;
+    
+    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role")
+    private Set<Role> roles = new HashSet<>();
+    
+    // Enum para roles
+    public enum Role {
+        USER, ADMIN
+    }
     
     // Construtores
     public User() {
@@ -117,6 +135,22 @@ public class User {
     
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+    
+    public String getPassword() {
+        return password;
+    }
+    
+    public void setPassword(String password) {
+        this.password = password;
+    }
+    
+    public Set<Role> getRoles() {
+        return roles;
+    }
+    
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
     
     // Métodos de callback JPA
