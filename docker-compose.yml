@@ -6,7 +6,7 @@ services:
     build:
       context: ./user-management-backend
       dockerfile: Dockerfile
-    container_name: user-management-backend
+    container_name: user-management-backend-v2
     ports:
       - "8080:8080"
     environment:
@@ -25,7 +25,7 @@ services:
       retries: 3
       start_period: 40s
     networks:
-      - user-management-network
+      - user-management-network-v2
     restart: unless-stopped
 
   # Frontend Service
@@ -33,7 +33,7 @@ services:
     build:
       context: ./user-management-frontend
       dockerfile: Dockerfile
-    container_name: user-management-frontend
+    container_name: user-management-frontend-v2
     ports:
       - "3000:80"
     depends_on:
@@ -48,11 +48,11 @@ services:
       retries: 3
       start_period: 30s
     networks:
-      - user-management-network
+      - user-management-network-v2
     restart: unless-stopped
 
 networks:
-  user-management-network:
+  user-management-network-v2:
     driver: bridge
 
 volumes:
