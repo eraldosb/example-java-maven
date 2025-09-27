@@ -29,8 +29,9 @@ Uma aplicação Java moderna para gerenciamento de usuários construída com Spr
 ### Pré-requisitos
 - Java 11 ou superior
 - Maven 3.6 ou superior
+- Docker e Docker Compose (opcional)
 
-### Executando a aplicação
+### Opção 1: Executando com Maven
 
 1. **Clone o repositório:**
 ```bash
@@ -45,6 +46,46 @@ mvn spring-boot:run
 ```
 
 3. **Acesse a aplicação:**
+- **API REST:** http://localhost:8080/api/users
+- **Console H2:** http://localhost:8080/h2-console
+  - JDBC URL: `jdbc:h2:mem:testdb`
+  - Username: `sa`
+  - Password: `password`
+
+### Opção 2: Executando com Docker 🐳
+
+1. **Clone o repositório:**
+```bash
+git clone <url-do-repositorio>
+cd example-java-maven
+```
+
+2. **Execute com Docker Compose (recomendado):**
+```bash
+# Build e execução automática
+./docker-run.sh
+
+# Ou manualmente:
+mvn clean package -DskipTests
+docker-compose up -d
+```
+
+3. **Verificar status:**
+```bash
+docker-compose ps
+```
+
+4. **Acessar logs:**
+```bash
+docker-compose logs -f
+```
+
+5. **Parar a aplicação:**
+```bash
+docker-compose down
+```
+
+6. **Acesse a aplicação:**
 - **API REST:** http://localhost:8080/api/users
 - **Console H2:** http://localhost:8080/h2-console
   - JDBC URL: `jdbc:h2:mem:testdb`
@@ -148,6 +189,32 @@ src/
         │   └── UserServiceTest.java          # Testes unitários do service
         └── controller/
             └── UserControllerTest.java       # Testes unitários do controller
+
+## 🐳 Docker
+
+### Arquivos Docker
+- `Dockerfile` - Configuração da imagem Docker
+- `docker-compose.yml` - Orquestração dos containers
+- `.dockerignore` - Arquivos ignorados no build
+- `docker-run.sh` - Script automatizado para build e execução
+
+### Comandos Docker Úteis
+
+```bash
+# Build da imagem
+docker build -t user-management-app .
+
+# Executar container
+docker run -p 8080:8080 user-management-app
+
+# Ver logs do container
+docker-compose logs -f
+
+# Parar todos os containers
+docker-compose down
+
+# Remover volumes e imagens
+docker-compose down -v --rmi all
 ```
 
 ## 🔧 Configurações
