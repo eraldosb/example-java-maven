@@ -25,11 +25,13 @@ import {
   SkeletonText,
   Button,
 } from '@chakra-ui/react'
-import { EditIcon, DeleteIcon, ViewIcon } from '@chakra-ui/icons'
+import { EditIcon, DeleteIcon, ViewIcon, LockIcon } from '@chakra-ui/icons'
 import { User } from '../types/user'
 import { useDeleteUser, useActivateUser, useDeactivateUser } from '../hooks/useUsers'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { useAuth } from '../contexts/AuthContext'
+import TokenModal from './TokenModal'
 
 interface UserTableProps {
   users: User[]
@@ -45,13 +47,62 @@ export const UserTable: React.FC<UserTableProps> = ({
   onView,
 }) => {
   const toast = useToast()
+  const { user: currentUser } = useAuth()
   const deleteUserMutation = useDeleteUser()
   const activateUserMutation = useActivateUser()
   const deactivateUserMutation = useDeactivateUser()
   
+  // Token generation state
+  const [tokenModalOpen, setTokenModalOpen] = React.useState(false)
+  const [generatedToken, setGeneratedToken] = React.useState('')
+  const [tokenUserEmail, setTokenUserEmail] = React.useState('')
+  const [isGeneratingToken, setIsGeneratingToken] = React.useState(false)
+  
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [userToDelete, setUserToDelete] = React.useState<User | null>(null)
   const cancelRef = React.useRef<HTMLButtonElement>(null)
+
+  // Generate token function
+  const handleGenerateToken = async (user: User) => {
+    setIsGeneratingToken(true)
+    try {
+      const response = await fetch('/api/admin/generate-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({ email: user.email }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Erro ao gerar token')
+      }
+
+      const data = await response.json()
+      setGeneratedToken(data.token)
+      setTokenUserEmail(user.email)
+      setTokenModalOpen(true)
+      
+      toast({
+        title: 'Token gerado!',
+        description: `Token gerado para ${user.name}`,
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      })
+    } catch (error) {
+      toast({
+        title: 'Erro ao gerar token',
+        description: 'Não foi possível gerar o token',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      })
+    } finally {
+      setIsGeneratingToken(false)
+    }
+  }
 
   const handleDeleteClick = (user: User) => {
     setUserToDelete(user)
@@ -210,6 +261,20 @@ export const UserTable: React.FC<UserTableProps> = ({
                       />
                     </Tooltip>
                     
+                    {currentUser?.roles.includes('ADMIN') && (
+                      <Tooltip label="Gerar Token">
+                        <IconButton
+                          aria-label="Gerar token para usuário"
+                          icon={<LockIcon />}
+                          size="sm"
+                          variant="ghost"
+                          colorScheme="purple"
+                          onClick={() => handleGenerateToken(user)}
+                          isLoading={isGeneratingToken}
+                        />
+                      </Tooltip>
+                    )}
+                    
                     <Tooltip label={user.active ? 'Desativar' : 'Ativar'}>
                       <IconButton
                         aria-label={user.active ? 'Desativar usuário' : 'Ativar usuário'}
@@ -278,6 +343,14 @@ export const UserTable: React.FC<UserTableProps> = ({
           </AlertDialogContent>
         </AlertDialogOverlay>
       </AlertDialog>
+
+      {/* Token Modal */}
+      <TokenModal
+        isOpen={tokenModalOpen}
+        onClose={() => setTokenModalOpen(false)}
+        token={generatedToken}
+        userEmail={tokenUserEmail}
+      />
     </>
   )
 }

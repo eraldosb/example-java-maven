@@ -116,6 +116,12 @@ export const userService = {
     const response = await api.get(`/users/age-range?minAge=${minAge}&maxAge=${maxAge}`)
     return response.data
   },
+
+  // Generate token for user (Admin only)
+  generateTokenForUser: async (email: string): Promise<{ token: string; user: User }> => {
+    const response = await api.post('/admin/generate-token', { email })
+    return response.data
+  },
 }
 
 export default api
