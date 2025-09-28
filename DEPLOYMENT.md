@@ -4,6 +4,22 @@
 **Data:** 2024-01-15  
 **Versão:** 1.0.0  
 
+## Sumário
+
+- [Resumo Executivo](#resumo-executivo)
+- [Contexto](#contexto)
+- [Ambientes](#ambientes)
+- [Desenvolvimento Local](#desenvolvimento-local)
+- [Containerização](#containerização)
+- [Deployment em Produção](#deployment-em-produção)
+- [CI/CD](#cicd)
+- [Monitoramento](#monitoramento)
+- [Backup e Recuperação](#backup-e-recuperação)
+- [Segurança](#segurança)
+- [Performance](#performance)
+- [Troubleshooting](#troubleshooting)
+- [Checklist de Deployment](#checklist-de-deployment)
+
 ## Resumo Executivo
 
 A User Management Application suporta múltiplas estratégias de deployment, desde desenvolvimento local até ambientes de produção. A aplicação utiliza Docker para containerização, Maven para build e pode ser deployada em diferentes plataformas cloud.

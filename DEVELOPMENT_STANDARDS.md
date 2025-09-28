@@ -4,6 +4,20 @@
 **Data:** 2024-01-15  
 **Versão:** 1.0.0  
 
+## Sumário
+
+- [Resumo Executivo](#resumo-executivo)
+- [Convenções de Código](#convenções-de-código)
+- [Arquitetura](#arquitetura)
+- [Padrões de API](#padrões-de-api)
+- [Testes](#testes)
+- [Documentação](#documentação)
+- [Git e Versionamento](#git-e-versionamento)
+- [Performance](#performance)
+- [Segurança](#segurança)
+- [Ferramentas](#ferramentas)
+- [Checklist de Desenvolvimento](#checklist-de-desenvolvimento)
+
 ## Resumo Executivo
 
 Este documento estabelece os padrões de desenvolvimento, boas práticas e guidelines para o projeto User Management Application. Os padrões cobrem desde convenções de código até arquitetura, testes e documentação.

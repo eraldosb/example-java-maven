@@ -527,6 +527,30 @@ const UserForm = () => {
   - ✅ Manutenibilidade
   - ❌ Mais complexidade inicial
 
+## Containerização
+
+### Docker
+A aplicação utiliza Docker para containerização, permitindo deployment consistente em diferentes ambientes.
+
+#### Arquivos de Configuração:
+- **`Dockerfile`**: Define a imagem da aplicação Spring Boot
+- **`docker-compose.yml`**: Orquestra múltiplos serviços (app + banco)
+
+#### Benefícios:
+- ✅ Ambiente consistente
+- ✅ Facilita deployment
+- ✅ Isolamento de dependências
+- ✅ Escalabilidade horizontal
+
+### Estrutura de Container:
+```dockerfile
+FROM openjdk:11-jre-slim
+WORKDIR /app
+COPY target/user-management-app-1.0.0.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
+```
+
 ## Referências
 
 - [Spring Boot Documentation](https://spring.io/projects/spring-boot)
