@@ -24,6 +24,7 @@ import {
   SettingsIcon,
   InfoIcon,
   ChevronDownIcon,
+  LockIcon,
 } from '@chakra-ui/icons'
 import { Link as RouterLink, useLocation } from 'react-router-dom'
 import { Link } from '@chakra-ui/react'
@@ -43,6 +44,7 @@ interface NavItem {
 const NavItems: NavItem[] = [
   { label: 'Dashboard', href: '/', icon: <SettingsIcon /> },
   { label: 'Usuários', href: '/users', icon: <SettingsIcon /> },
+  { label: 'Tokens', href: '/tokens', icon: <LockIcon /> },
   { label: 'Status', href: '/status', icon: <InfoIcon /> },
 ]
 

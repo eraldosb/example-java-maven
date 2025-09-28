@@ -4,6 +4,29 @@
 **Data:** 2024-01-15  
 **Versão:** 1.0.0  
 
+## Sumário
+
+- [Resumo Executivo](#resumo-executivo)
+- [Contexto](#contexto)
+- [Arquitetura](#arquitetura)
+- [Tecnologias](#tecnologias)
+- [Estrutura do Projeto](#estrutura-do-projeto)
+- [Componentes](#componentes)
+- [Hooks](#hooks)
+- [Serviços](#serviços)
+- [Páginas](#páginas)
+- [Tema e Estilização](#tema-e-estilização)
+- [Roteamento](#roteamento)
+- [Gerenciamento de Estado](#gerenciamento-de-estado)
+- [Formulários](#formulários)
+- [Tratamento de Erros](#tratamento-de-erros)
+- [Performance](#performance)
+- [Acessibilidade](#acessibilidade)
+- [Testes](#testes)
+- [Build e Deploy](#build-e-deploy)
+- [Desenvolvimento](#desenvolvimento)
+- [Troubleshooting](#troubleshooting)
+
 ## Resumo Executivo
 
 O frontend da User Management Application é uma Single Page Application (SPA) construída com React 19, TypeScript e Chakra UI. A aplicação oferece uma interface moderna e responsiva para gerenciamento de usuários, com funcionalidades completas de CRUD, busca avançada e estatísticas em tempo real.

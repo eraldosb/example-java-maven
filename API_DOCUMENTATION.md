@@ -103,6 +103,74 @@ A API utiliza JWT (JSON Web Token) para autenticação. Todos os endpoints prote
 curl -H "Authorization: Bearer SEU_TOKEN_AQUI" http://localhost:8080/api/users
 ```
 
+#### Exemplo Completo de Fluxo de Autenticação:
+
+**1. Fazer Login e Obter Token:**
+```bash
+# Login
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "password": "user123"
+  }'
+
+# Resposta (salve o token retornado)
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiaWF0IjoxNzA2MzQ1NjAwLCJleHAiOjE3MDY0MzIwMDB9.abc123...",
+  "user": {
+    "id": 1,
+    "name": "Usuário Padrão",
+    "email": "user@example.com",
+    "roles": ["USER"]
+  }
+}
+```
+
+**2. Usar Token em Requisições Protegidas:**
+```bash
+# Listar usuários (requer token)
+curl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiaWF0IjoxNzA2MzQ1NjAwLCJleHAiOjE3MDY0MzIwMDB9.abc123..." \
+  http://localhost:8080/api/users
+
+# Criar usuário (requer token)
+curl -X POST http://localhost:8080/api/users \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiaWF0IjoxNzA2MzQ1NjAwLCJleHAiOjE3MDY0MzIwMDB9.abc123..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Maria Santos",
+    "email": "maria@email.com",
+    "phone": "11777777777",
+    "age": 28
+  }'
+
+# Buscar usuário por ID (requer token)
+curl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiaWF0IjoxNzA2MzQ1NjAwLCJleHAiOjE3MDY0MzIwMDB9.abc123..." \
+  http://localhost:8080/api/users/1
+
+# Atualizar usuário (requer token)
+curl -X PUT http://localhost:8080/api/users/1 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiaWF0IjoxNzA2MzQ1NjAwLCJleHAiOjE3MDY0MzIwMDB9.abc123..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Usuário Atualizado",
+    "email": "user@example.com",
+    "phone": "11999999999",
+    "age": 26
+  }'
+
+# Deletar usuário (requer token)
+curl -X DELETE http://localhost:8080/api/users/1 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiaWF0IjoxNzA2MzQ1NjAwLCJleHAiOjE3MDY0MzIwMDB9.abc123..."
+```
+
+**3. Validar Token:**
+```bash
+# Verificar se token ainda é válido
+curl -X POST http://localhost:8080/api/auth/validate \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiaWF0IjoxNzA2MzQ1NjAwLCJleHAiOjE3MDY0MzIwMDB9.abc123..."
+```
+
 #### Usuários padrão criados automaticamente:
 - **Admin**: `admin@example.com` / `admin123`
 - **User**: `user@example.com` / `user123`
@@ -594,7 +662,7 @@ curl http://localhost:8080/api/users/stats
 
 ## Exemplos de Integração
 
-### JavaScript/TypeScript
+### JavaScript/TypeScript com Autenticação
 
 ```typescript
 // Cliente HTTP usando Axios
@@ -607,96 +675,301 @@ const api = axios.create({
   },
 });
 
-// Criar usuário
-const createUser = async (userData: CreateUserRequest) => {
-  try {
-    const response = await api.post('/users', userData);
-    return response.data;
-  } catch (error) {
-    throw new Error(error.response?.data?.message || 'Erro ao criar usuário');
+// Interceptor para adicionar token automaticamente
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('authToken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Interceptor para tratar erros de autenticação
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('authToken');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
+// Autenticação
+const authService = {
+  // Login
+  async login(email: string, password: string) {
+    try {
+      const response = await api.post('/auth/login', { email, password });
+      const { token, user } = response.data;
+      localStorage.setItem('authToken', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      return { token, user };
+    } catch (error) {
+      throw new Error('Credenciais inválidas');
+    }
+  },
+
+  // Registro
+  async register(userData: RegisterRequest) {
+    try {
+      const response = await api.post('/auth/register', userData);
+      const { token, user } = response.data;
+      localStorage.setItem('authToken', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      return { token, user };
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Erro ao registrar usuário');
+    }
+  },
+
+  // Validar token
+  async validateToken() {
+    try {
+      const response = await api.post('/auth/validate');
+      return response.data.valid;
+    } catch (error) {
+      return false;
+    }
+  },
+
+  // Logout
+  logout() {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
   }
 };
 
-// Buscar usuários
-const getUsers = async () => {
-  try {
-    const response = await api.get('/users');
-    return response.data;
-  } catch (error) {
-    throw new Error('Erro ao buscar usuários');
+// Operações de usuário (requerem autenticação)
+const userService = {
+  // Criar usuário
+  async createUser(userData: CreateUserRequest) {
+    try {
+      const response = await api.post('/users', userData);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Erro ao criar usuário');
+    }
+  },
+
+  // Buscar usuários
+  async getUsers() {
+    try {
+      const response = await api.get('/users');
+      return response.data;
+    } catch (error) {
+      throw new Error('Erro ao buscar usuários');
+    }
+  },
+
+  // Atualizar usuário
+  async updateUser(id: number, userData: UpdateUserRequest) {
+    try {
+      const response = await api.put(`/users/${id}`, userData);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Erro ao atualizar usuário');
+    }
+  },
+
+  // Deletar usuário
+  async deleteUser(id: number) {
+    try {
+      await api.delete(`/users/${id}`);
+    } catch (error) {
+      throw new Error('Erro ao deletar usuário');
+    }
   }
 };
 
-// Atualizar usuário
-const updateUser = async (id: number, userData: UpdateUserRequest) => {
+// Exemplo de uso
+const exemploUso = async () => {
   try {
-    const response = await api.put(`/users/${id}`, userData);
-    return response.data;
+    // 1. Fazer login
+    const { token, user } = await authService.login('user@example.com', 'user123');
+    console.log('Login realizado:', user);
+
+    // 2. Buscar usuários
+    const users = await userService.getUsers();
+    console.log('Usuários:', users);
+
+    // 3. Criar novo usuário
+    const newUser = await userService.createUser({
+      name: 'João Silva',
+      email: 'joao@email.com',
+      phone: '11999999999',
+      age: 30
+    });
+    console.log('Usuário criado:', newUser);
+
   } catch (error) {
-    throw new Error(error.response?.data?.message || 'Erro ao atualizar usuário');
+    console.error('Erro:', error.message);
   }
 };
 ```
 
-### Python
+### Python com Autenticação
 
 ```python
 import requests
 import json
 
-BASE_URL = 'http://localhost:8080/api'
-
-def create_user(user_data):
-    """Cria um novo usuário"""
-    response = requests.post(
-        f'{BASE_URL}/users',
-        json=user_data,
-        headers={'Content-Type': 'application/json'}
-    )
+class UserManagementAPI:
+    def __init__(self, base_url='http://localhost:8080/api'):
+        self.base_url = base_url
+        self.token = None
+        self.session = requests.Session()
     
-    if response.status_code == 201:
-        return response.json()
-    else:
-        raise Exception(f'Erro ao criar usuário: {response.json().get("message")}')
-
-def get_users():
-    """Busca todos os usuários"""
-    response = requests.get(f'{BASE_URL}/users')
+    def _get_headers(self):
+        headers = {'Content-Type': 'application/json'}
+        if self.token:
+            headers['Authorization'] = f'Bearer {self.token}'
+        return headers
     
-    if response.status_code == 200:
-        return response.json()
-    else:
-        raise Exception('Erro ao buscar usuários')
-
-def search_users_by_name(name):
-    """Busca usuários por nome"""
-    response = requests.get(f'{BASE_URL}/users/search', params={'name': name})
+    # Autenticação
+    def login(self, email, password):
+        """Fazer login e obter token"""
+        data = {'email': email, 'password': password}
+        response = self.session.post(
+            f'{self.base_url}/auth/login',
+            json=data,
+            headers=self._get_headers()
+        )
+        
+        if response.status_code == 200:
+            result = response.json()
+            self.token = result['token']
+            return result
+        else:
+            raise Exception(f'Erro no login: {response.text}')
     
-    if response.status_code == 200:
-        return response.json()
-    else:
-        raise Exception('Erro ao buscar usuários')
+    def register(self, user_data):
+        """Registrar novo usuário"""
+        response = self.session.post(
+            f'{self.base_url}/auth/register',
+            json=user_data,
+            headers=self._get_headers()
+        )
+        
+        if response.status_code == 201:
+            result = response.json()
+            self.token = result['token']
+            return result
+        else:
+            raise Exception(f'Erro no registro: {response.text}')
+    
+    def validate_token(self):
+        """Validar token atual"""
+        if not self.token:
+            return False
+        
+        response = self.session.post(
+            f'{self.base_url}/auth/validate',
+            headers=self._get_headers()
+        )
+        return response.status_code == 200
+    
+    # Operações de usuário
+    def create_user(self, user_data):
+        """Criar usuário (requer autenticação)"""
+        response = self.session.post(
+            f'{self.base_url}/users',
+            json=user_data,
+            headers=self._get_headers()
+        )
+        
+        if response.status_code == 201:
+            return response.json()
+        else:
+            raise Exception(f'Erro ao criar usuário: {response.text}')
+    
+    def get_users(self):
+        """Buscar usuários (requer autenticação)"""
+        response = self.session.get(
+            f'{self.base_url}/users',
+            headers=self._get_headers()
+        )
+        
+        if response.status_code == 200:
+            return response.json()
+        else:
+            raise Exception(f'Erro ao buscar usuários: {response.text}')
+    
+    def get_user(self, user_id):
+        """Buscar usuário por ID (requer autenticação)"""
+        response = self.session.get(
+            f'{self.base_url}/users/{user_id}',
+            headers=self._get_headers()
+        )
+        
+        if response.status_code == 200:
+            return response.json()
+        else:
+            raise Exception(f'Erro ao buscar usuário: {response.text}')
+    
+    def update_user(self, user_id, user_data):
+        """Atualizar usuário (requer autenticação)"""
+        response = self.session.put(
+            f'{self.base_url}/users/{user_id}',
+            json=user_data,
+            headers=self._get_headers()
+        )
+        
+        if response.status_code == 200:
+            return response.json()
+        else:
+            raise Exception(f'Erro ao atualizar usuário: {response.text}')
+    
+    def delete_user(self, user_id):
+        """Deletar usuário (requer autenticação)"""
+        response = self.session.delete(
+            f'{self.base_url}/users/{user_id}',
+            headers=self._get_headers()
+        )
+        
+        if response.status_code == 204:
+            return True
+        else:
+            raise Exception(f'Erro ao deletar usuário: {response.text}')
 
 # Exemplo de uso
-user_data = {
-    'name': 'João Silva',
-    'email': 'joao@email.com',
-    'phone': '11999999999',
-    'age': 30
-}
+def exemplo_uso():
+    api = UserManagementAPI()
+    
+    try:
+        # 1. Fazer login
+        login_result = api.login('user@example.com', 'user123')
+        print(f'Login realizado: {login_result["user"]["name"]}')
+        
+        # 2. Buscar usuários
+        users = api.get_users()
+        print(f'Usuários encontrados: {len(users)}')
+        
+        # 3. Criar novo usuário
+        new_user = api.create_user({
+            'name': 'Maria Silva',
+            'email': 'maria@email.com',
+            'phone': '11888888888',
+            'age': 25
+        })
+        print(f'Usuário criado: {new_user["name"]}')
+        
+        # 4. Atualizar usuário
+        updated_user = api.update_user(new_user['id'], {
+            'name': 'Maria Silva Santos',
+            'email': 'maria@email.com',
+            'phone': '11888888888',
+            'age': 26
+        })
+        print(f'Usuário atualizado: {updated_user["name"]}')
+        
+    except Exception as e:
+        print(f'Erro: {e}')
 
-try:
-    user = create_user(user_data)
-    print(f'Usuário criado: {user}')
-    
-    users = get_users()
-    print(f'Total de usuários: {len(users)}')
-    
-    search_results = search_users_by_name('João')
-    print(f'Usuários encontrados: {len(search_results)}')
-    
-except Exception as e:
-    print(f'Erro: {e}')
+# Executar exemplo
+if __name__ == '__main__':
+    exemplo_uso()
 ```
 
 ### cURL - Scripts Completos
@@ -815,6 +1088,126 @@ get_users_by_age_range 25 35
 
 echo -e "\n=== Obtendo estatísticas ==="
 get_user_stats
+```
+
+### Scripts cURL com Autenticação
+
+```bash
+#!/bin/bash
+
+# Script completo de teste com autenticação
+BASE_URL="http://localhost:8080/api"
+USER_EMAIL="user@example.com"
+USER_PASSWORD="user123"
+
+echo "=== SCRIPT DE TESTE COMPLETO DA API ==="
+
+# 1. Fazer Login
+echo "1. Fazendo login..."
+LOGIN_RESPONSE=$(curl -s -X POST "$BASE_URL/auth/login" \
+  -H "Content-Type: application/json" \
+  -d "{\"email\": \"$USER_EMAIL\", \"password\": \"$USER_PASSWORD\"}")
+
+echo "Resposta do login: $LOGIN_RESPONSE"
+
+# Extrair token da resposta
+TOKEN=$(echo $LOGIN_RESPONSE | grep -o '"token":"[^"]*"' | cut -d'"' -f4)
+echo "Token extraído: ${TOKEN:0:50}..."
+
+if [ -z "$TOKEN" ]; then
+    echo "Erro: Não foi possível obter o token de autenticação"
+    exit 1
+fi
+
+# 2. Validar Token
+echo -e "\n2. Validando token..."
+curl -s -X POST "$BASE_URL/auth/validate" \
+  -H "Authorization: Bearer $TOKEN" \
+  -w "\nStatus: %{http_code}\n"
+
+# 3. Buscar usuários (requer autenticação)
+echo -e "\n3. Buscando usuários..."
+curl -s -X GET "$BASE_URL/users" \
+  -H "Authorization: Bearer $TOKEN" \
+  -w "\nStatus: %{http_code}\n"
+
+# 4. Criar novo usuário (requer autenticação)
+echo -e "\n4. Criando novo usuário..."
+NEW_USER_DATA='{"name": "Maria Silva", "email": "maria@email.com", "phone": "11888888888", "age": 25}'
+CREATE_RESPONSE=$(curl -s -X POST "$BASE_URL/users" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "$NEW_USER_DATA" \
+  -w "\nStatus: %{http_code}\n")
+
+echo "Resposta da criação: $CREATE_RESPONSE"
+
+# Extrair ID do usuário criado
+USER_ID=$(echo $CREATE_RESPONSE | grep -o '"id":[0-9]*' | cut -d':' -f2)
+echo "ID do usuário criado: $USER_ID"
+
+# 5. Buscar usuário específico
+if [ ! -z "$USER_ID" ]; then
+    echo -e "\n5. Buscando usuário por ID ($USER_ID)..."
+    curl -s -X GET "$BASE_URL/users/$USER_ID" \
+      -H "Authorization: Bearer $TOKEN" \
+      -w "\nStatus: %{http_code}\n"
+fi
+
+# 6. Atualizar usuário
+if [ ! -z "$USER_ID" ]; then
+    echo -e "\n6. Atualizando usuário ($USER_ID)..."
+    UPDATE_DATA='{"name": "Maria Silva Santos", "email": "maria@email.com", "phone": "11888888888", "age": 26}'
+    curl -s -X PUT "$BASE_URL/users/$USER_ID" \
+      -H "Authorization: Bearer $TOKEN" \
+      -H "Content-Type: application/json" \
+      -d "$UPDATE_DATA" \
+      -w "\nStatus: %{http_code}\n"
+fi
+
+# 7. Buscar usuários novamente
+echo -e "\n7. Listando usuários após operações..."
+curl -s -X GET "$BASE_URL/users" \
+  -H "Authorization: Bearer $TOKEN" \
+  -w "\nStatus: %{http_code}\n"
+
+echo -e "\n=== TESTE CONCLUÍDO ==="
+```
+
+### Teste com Usuário Admin
+
+```bash
+#!/bin/bash
+
+# Teste com usuário admin
+BASE_URL="http://localhost:8080/api"
+ADMIN_EMAIL="admin@example.com"
+ADMIN_PASSWORD="admin123"
+
+echo "=== TESTE COM USUÁRIO ADMIN ==="
+
+# Login como admin
+echo "Fazendo login como admin..."
+ADMIN_RESPONSE=$(curl -s -X POST "$BASE_URL/auth/login" \
+  -H "Content-Type: application/json" \
+  -d "{\"email\": \"$ADMIN_EMAIL\", \"password\": \"$ADMIN_PASSWORD\"}")
+
+echo "Resposta do login admin: $ADMIN_RESPONSE"
+
+# Extrair token admin
+ADMIN_TOKEN=$(echo $ADMIN_RESPONSE | grep -o '"token":"[^"]*"' | cut -d'"' -f4)
+
+if [ ! -z "$ADMIN_TOKEN" ]; then
+    echo "Token admin obtido: ${ADMIN_TOKEN:0:50}..."
+    
+    # Testar operações com admin
+    echo -e "\nTestando operações com admin..."
+    curl -s -X GET "$BASE_URL/users" \
+      -H "Authorization: Bearer $ADMIN_TOKEN" \
+      -w "\nStatus: %{http_code}\n"
+else
+    echo "Erro: Não foi possível obter token admin"
+fi
 ```
 
 ## Rate Limiting e Performance

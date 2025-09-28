@@ -4,6 +4,7 @@ import com.example.usermanagement.model.User;
 import com.example.usermanagement.service.JwtService;
 import com.example.usermanagement.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -131,6 +132,32 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(Map.of("valid", false, "error", "Erro ao validar token"));
+        }
+    }
+    
+    @PostMapping("/generate-my-token")
+    public ResponseEntity<?> generateMyToken(Authentication authentication) {
+        try {
+            String email = authentication.getName();
+            User user = userService.getUserByEmail(email)
+                            .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("roles", user.getRoles());
+            claims.put("userId", user.getId());
+
+            String jwt = jwtService.generateToken(email, claims);
+            System.out.println("🔑 Token gerado para usuário: " + email);
+
+            return ResponseEntity.ok(Map.of(
+                "token", jwt,
+                "expiresIn", "24 horas",
+                "user", user
+            ));
+        } catch (Exception e) {
+            System.err.println("❌ Erro ao gerar token para usuário: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("message", "Erro ao gerar token"));
         }
     }
     

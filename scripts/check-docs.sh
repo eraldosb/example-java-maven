@@ -94,12 +94,12 @@ check_markdown_structure() {
     fi
     
     # Check for author and date
-    if ! grep -q "**Autor:**" "$file"; then
+    if ! grep -q "\*\*Autor:\*\*" "$file"; then
         print_status "WARNING" "$description: Falta informação do autor"
         issues=$((issues + 1))
     fi
     
-    if ! grep -q "**Data:**" "$file"; then
+    if ! grep -q "\*\*Data:\*\*" "$file"; then
         print_status "WARNING" "$description: Falta informação da data"
         issues=$((issues + 1))
     fi

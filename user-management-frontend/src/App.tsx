@@ -8,6 +8,7 @@ import { DashboardPage } from './pages/DashboardPage'
 import { UsersPage } from './pages/UsersPage'
 import { StatusPage } from './pages/StatusPage'
 import LoginPage from './pages/LoginPage'
+import TokensPage from './pages/TokensPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import theme from './theme'
 
@@ -48,6 +49,13 @@ function App() {
                 <ProtectedRoute>
                   <Layout>
                     <StatusPage />
+                  </Layout>
+                </ProtectedRoute>
+              } />
+              <Route path="/tokens" element={
+                <ProtectedRoute>
+                  <Layout>
+                    <TokensPage />
                   </Layout>
                 </ProtectedRoute>
               } />

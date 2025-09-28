@@ -60,6 +60,10 @@ public class JwtService {
         return createToken(claims, username);
     }
     
+    public String generateToken(String username, Map<String, Object> claims) {
+        return createToken(claims, username);
+    }
+    
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .setClaims(claims)
